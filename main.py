@@ -1,6 +1,7 @@
 import cv2
 import numpy as np
 from os import system
+import concurrent.futures as c
 
 def fps_cont(frame_count, width):
     if width == 1:
@@ -8,9 +9,11 @@ def fps_cont(frame_count, width):
     else:
         return int(frame_count/width)
 
-def make_barcode(movie_path, image_path, width_pass):
+def make_barcode(path):
 
-    cap = cv2.VideoCapture(movie_path)
+    width_pass = 130
+
+    cap = cv2.VideoCapture(path[0])
     width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
     height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
     img = np.zeros((int(height),1,3),np.uint8)
@@ -32,25 +35,42 @@ def make_barcode(movie_path, image_path, width_pass):
 
         if frame_count % fps_cont(total_frames, width_pass) == 0:
             img = cv2.hconcat([img, cv2.resize(frame, (1,height))])
-            if int(frame_count/total_frames*100) != int((frame_count-1)/total_frames*100):
-                print(str(int(frame_count/total_frames*100))+" % Done!")
+            print(str((total_frames/(frame_count+1))*100) + " % Done!")
 
         frame_count += 1
-        cv2.imshow('frame',cv2.resize(img, (width, height)))
+        cv2.imshow(path[0],cv2.resize(img, (1500, int(height/3))))
+        #cv2.imshow('frame',frame)
 
-    cv2.imwrite(image_path, img)
+    cv2.imwrite(path[1], img)
     print("Image created!")
 
-for i in range(2,8):
-    movie_path = "D:\Documents\Code\Python\movieImage\movie" + str(i) + ".mp4"
-    pic_path = "D:\Documents\Code\Python\movieImage\pic" + str(i) + ".png"
+if __name__ == '__main__':
 
+    path_arr = []
+
+    moviePath = '/home/mayankthakur/Downloads/Over.the.Moon.2020.1080p.WEBRip.x265-RARBG/Over.the.Moon.2020.1080p.WEBRip.x265-RARBG.mp4'
+    picPath = 'bruhhhh.png'
+    make_barcode([moviePath, picPath])
     img_rand = np.ones((100,100,3),np.uint8)
-    cv2.imwrite(pic_path, img_rand)
+    cv2.imwrite(picPath, img_rand)
 
-    cont = make_barcode(movie_path, pic_path, 4500)
 
-    if cont == False:
-        break
+    #for i in range(1,35):
+    #    #movie_path = "D:\Documents\Code\Python\movieImage\\" + "({})".format(i) + ".mp4"
+    #    #pic_path = "D:\Documents\Code\Python\movieImage\movie" + "pic" + str(i) + ".png"
 
-print("Done!")
+    #    movie_path = "({})".format(i) + ".mp4"
+    #    pic_path = "pic" + str(i) + ".png"
+
+    #    #img_rand = np.ones((100,100,3),np.uint8)
+    #    #cv2.imwrite(pic_path, img_rand)
+
+    #    path_arr.append([movie_path, pic_path])
+    #    #print([movie_path, pic_path])
+    #    #make_barcode([movie_path, pic_path])
+
+    #with c.ProcessPoolExecutor() as e:
+    #    e.map(make_barcode, path_arr)
+
+
+    print("Done!")
